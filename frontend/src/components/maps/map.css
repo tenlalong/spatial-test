@@ -1,0 +1,38 @@
+.map-container {
+    max-width: 100%;
+    height: 0;
+    padding-bottom: 60%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .map {
+    width: 80%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .radius-input {
+    margin-bottom: 20px;
+  }
+
+  .radius-input input {
+    font-family: "Times New Roman MT Condensed Bold";
+    font-size: 14px;
+    color: black;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .mapboxgl-ctrl {
+    display: none !important;
+  }
+
+  

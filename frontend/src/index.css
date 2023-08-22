@@ -1,0 +1,25 @@
+body {
+  margin: 0;
+  font-family: "Times New Roman MT Condensed Bold";
+  letter-spacing: 1px;
+  font-size: 25px;
+  line-height: 0.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: url(./uploads/overlay.gif);
+}
+
+@font-face {
+  font-family: "Times New Roman MT Condensed Bold";
+  src: url("./fonts/custom_font.otf")
+    format("truetype");
+}
+
+* {
+  color: #fef3d7;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}

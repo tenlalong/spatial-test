@@ -1,0 +1,8 @@
+.name-animation-container {
+    overflow: hidden; /* Hide any overflowing text */
+    white-space: nowrap; /* Ensure the text stays on a single line */
+    text-overflow: ellipsis; /* Add an ellipsis (...) if the text exceeds the container */
+    max-width: 100%; 
+    justify-content: center;
+    align-items: center;
+  }
