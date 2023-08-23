@@ -100,7 +100,7 @@ export default function Map() {
   };
 
   return (
-    <div>
+    <div className='container'>
       <div className='radius-input'>
         <input 
         type='number'
