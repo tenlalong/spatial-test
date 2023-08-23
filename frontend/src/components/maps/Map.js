@@ -65,7 +65,16 @@ export default function Map() {
       type: 'Point',
       coordinates: [e.lngLat.lng, e.lngLat.lat],
     });
-  
+
+    try {
+      const demographicData = await fetchDemographicData(e.lngLat.lng, e.lngLat.lat);
+      setDemographicData(demographicData);
+    } catch (error) {
+      console.error('Error fetching demographic data:', error);
+    }
+  };
+
+  const fetchDemographicData = async (lng, lat) => {
     try {
       const response = await fetch('http://localhost:3001/calculate-demographics', {
         method: 'POST',
@@ -73,20 +82,19 @@ export default function Map() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          circleCenter: [e.lngLat.lng, e.lngLat.lat],
+          circleCenter: [lng, lat],
           circleRadius: circleRadius,
         }),
       });
-  
-      if (response.ok) {
-        const demographicData = await response.json();
-        // const calculatedData = calculateDemographicHarvesting(demographicData);
-        setDemographicData(demographicData);
-      } else {
-        console.error('Request failed with status:', response.status);
+
+      if (!response.ok) {
+        throw new Error(`Request failed with status: ${response.status}`);
       }
+
+      const demographicData = await response.json();
+      return demographicData;
     } catch (error) {
-      console.log(error);
+      console.log('Error fetching demographic data:', error);
       throw error;
     }
   };

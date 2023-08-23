@@ -1,54 +1,55 @@
 const express = require('express');
-const pgp = require('pg-promise')();
-const turf = require('@turf/turf');
-
 const app = express();
-const db = pgp({
-  connectionString: 'postgresql://guest:U8OPtddp@3.235.170.15:5432/gis'
-});
-
+const { Client } = require('pg');
 
 app.use(express.json());
 
+const dbClient = new Client({
+    connectionString: 'postgresql://guest:U8OPtddp@3.235.170.15:5432/gis'
+});
+
 app.post('/calculate-demographics', async (req, res) => {
-    const circleCenter = req.body.circleCenter;
-    const circleRadius = req.body.circleRadius;
-  
-    const circle = turf.circle(circleCenter, circleRadius);
-    const circleGeoJSON = circle.geometry;
-  
-    const demographicData = await calculateDemographicHarvesting(circleGeoJSON);
-  
-    res.json(demographicData);
-  });
-
-async function calculateDemographicHarvesting(selectedArea) {
-
   try {
-    const query = `SELECT 
-    SUM(population) AS total_population,
-    AVG(income) AS average_income
-    FROM
-    dfw_demo
-    WHERE
-    ST_Intersects(ST_GeomFromGeoJSON($1), spatialObj)`;
+      await dbClient.connect(); 
 
-    const result = await db.one(query, JSON.stringify(selectedArea));
+      const circleCenter = req.body.circleCenter;
+      const circleRadius = req.body.circleRadius;
 
-    console.error(result.total_population, result.average_income);
+      const demographicData = await calculateDemographicHarvesting(circleCenter, circleRadius);
 
-    return {
-      totalPopulation: result.total_population,
-      averageIncome: result.average_income,
-    }
-  } catch(err) {
-    console.log(err);
-    throw err;
+      res.json(demographicData);
+  } catch (error) {
+      console.error('Error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+  } finally {
+      await dbClient.end(); 
+  }
+});
+
+async function calculateDemographicHarvesting(circleCenter, circleRadius) {
+  try {
+      const query = `
+          SELECT 
+              SUM(population) AS total_population,
+              AVG(income) AS average_income
+          FROM dfw_demo
+          WHERE ST_DWithin(spatialObj, ST_SetSRID(ST_MakePoint($1, $2), 4326), $3)
+      `;
+
+      const result = await dbClient.query(query, [circleCenter[0], circleCenter[1], circleRadius]);
+
+      console.log('Query result:', result.rows);
+
+      return {
+          totalPopulation: result.rows[0].total_population,
+          averageIncome: result.rows[0].average_income,
+      };
+  } catch (error) {
+      console.error('Error executing query:', error);
+      throw error;
   }
 }
 
 app.listen(3001, () => {
   console.log('Server is running on port 3001');
-})
-
-
+});
