@@ -28,15 +28,15 @@ export default function NameAnimation() {
   }, []);
 
   const lines = name.split("\n").map((line, index) => {
-    let fontSize = "30px"; // Default font size
+    let fontSize = "30px"; 
     if (window.innerWidth <= 1024) {
-      fontSize = "20px"; // Font size for medium devices
+      fontSize = "20px"; 
     }
     if (window.innerWidth <= 768) {
-      fontSize = "15px"; // Font size for small devices
+      fontSize = "15px"; 
     }
     if (window.innerWidth <= 390) {
-      fontSize = "10px"; // Font size for extra small devices
+      fontSize = "10px"; 
     }
 
     return (

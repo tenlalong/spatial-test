@@ -76,16 +76,18 @@ export default function Map() {
 
   const fetchDemographicData = async (lng, lat) => {
     try {
-      const response = await fetch('http://localhost:3001/calculate-demographics', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          circleCenter: [lng, lat],
-          circleRadius: circleRadius,
-        }),
-      });
+      // const response = await fetch('http://localhost:3001/calculate-demographics', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify({
+      //     circleCenter: [lng, lat],
+      //     circleRadius: circleRadius,
+      //   }),
+      // });
+
+      const response = await fetch(`http://localhost:3001/foo?circleCenter=${lng},${lat}&circleRadius=${circleRadius}`);
 
       if (!response.ok) {
         throw new Error(`Request failed with status: ${response.status}`);
@@ -110,7 +112,7 @@ export default function Map() {
         min="100"
         />
       </div>
-      <div ref={mapContainer} className="map-container" />;
+      <div ref={mapContainer} className="map-container" />
 
       {demographicData && (
         <div className='demographic-results'>

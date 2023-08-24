@@ -1,15 +1,7 @@
-.container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-
 .map-container {
     max-width: 50%;
     height: 0;
-    padding-bottom: 60%;
+    padding-bottom: 50%;
     position: relative;
     display: flex;
     justify-content: center;
@@ -18,7 +10,6 @@
     margin-top: auto;
     margin-bottom: auto;
     transform: translateX(-50%);
-    top: 5%;
     left: 50%;
   }
 
@@ -31,9 +22,9 @@
 
   }
 
-  /* .radius-input {
-    margin-bottom: 20px;
-  } */
+  .radius-input {
+    margin-bottom: 40px;
+  }
 
   .radius-input input {
     font-family: "Times New Roman MT Condensed Bold";
@@ -42,10 +33,39 @@
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    background-color: #fef3d7;
   }
 
   .mapboxgl-ctrl {
     display: none !important;
   }
 
+  @media (max-width: 1024px) {
+    .map-container {
+      max-width: 70%; 
+    }
+
+    .radius-input {
+      margin-bottom: 40px; 
+    }
+  }
   
+  @media (max-width: 768px) {
+    .map-container {
+      max-width: 80%; 
+    }
+  
+    .radius-input {
+      margin-bottom: 40px; 
+    }
+  }
+  
+  @media (max-width: 390px) {
+    .map-container {
+      max-width: 90%; 
+    }
+
+    .radius-input {
+      margin-bottom: 40px; 
+    }
+  }
