@@ -7,7 +7,8 @@ mapboxgl.accessToken = 'pk.eyJ1IjoidGVubGFsb25nIiwiYSI6ImNsbGd0eXA3ZjEyZGYzZ25nY
 export default function Map() {
   const mapContainer = useRef(null);
   const mapRef = useRef(null);
-  const [circleCenter, setCircleCenter] = useState(null);
+  const circleSourceRef = useRef(null);
+  const [circleCenter, setCircleCenter] = useState([-74.5, 40]);
   const [circleRadius, setCircleRadius] = useState(500);
   const [demographicData, setDemographicData] = useState(null);
 
@@ -15,7 +16,7 @@ export default function Map() {
     const map = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v11',
-      center: circleCenter || [-74.5, 40],
+      center: [-74.5, 40],
       zoom: 9,
     });
 
@@ -34,10 +35,19 @@ export default function Map() {
         type: 'geojson',
         data: {
           type: 'FeatureCollection',
-          features: [],
+          features: [
+            {
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: circleCenter || [-74.5, 40],
+              },
+            },
+          ],
         },
       });
 
+      circleSourceRef.current = map.getSource('circle-source');
       map.addLayer({
         id: 'circle-layer',
         source: 'circle-source',
@@ -64,13 +74,26 @@ export default function Map() {
 
   const handleMapClick = async (e) => {
     setCircleCenter(e.lngLat);
+    setDemographicData(null);
     console.log('New Circle Center:', e.lngLat);
     
     if (mapRef.current) {
-      mapRef.current.getSource('circle-source').setData({
-        type: 'Point',
-        coordinates: [e.lngLat.lng, e.lngLat.lat],
-      });
+      const circleSource = mapRef.current.getSource('circle-source');
+      if(circleSource) {
+        mapRef.current.getSource('circle-source').setData({
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: [e.lngLat.lng, e.lngLat.lat],
+              },
+            },
+          ],
+        });
+      }
+      
     }
     
     console.log('Circle Data:', [e.lngLat.lng, e.lngLat.lat]);
@@ -98,6 +121,7 @@ export default function Map() {
 
       const demographicData = await response.json();
       console.log(demographicData);
+
       return demographicData;
     } catch (error) {
       console.log('Error fetching demographic data:', error);
