@@ -20,7 +20,7 @@ export default function NameAnimation() {
       }
     };
 
-    intervalId = setInterval(animateName, 70); // Adjust the interval duration for the desired speed
+    intervalId = setInterval(animateName, 40); // Adjust the interval duration for the desired speed
 
     return () => {
       clearInterval(intervalId);

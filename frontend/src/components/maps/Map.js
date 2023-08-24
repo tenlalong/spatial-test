@@ -6,6 +6,7 @@ mapboxgl.accessToken = 'pk.eyJ1IjoidGVubGFsb25nIiwiYSI6ImNsbGd0eXA3ZjEyZGYzZ25nY
 
 export default function Map() {
   const mapContainer = useRef(null);
+  const mapRef = useRef(null);
   const [circleCenter, setCircleCenter] = useState(null);
   const [circleRadius, setCircleRadius] = useState(500);
   const [demographicData, setDemographicData] = useState(null);
@@ -14,9 +15,11 @@ export default function Map() {
     const map = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v11',
-      center: [-74.5, 40],
+      center: circleCenter || [-74.5, 40],
       zoom: 9,
     });
+
+    map.on('click', handleMapClick);
 
     map.on('click', e => {
       setCircleCenter(e.lngLat);
@@ -50,7 +53,7 @@ export default function Map() {
 
 
     return () => map.remove();
-  }, [circleRadius]);
+  }, [circleCenter, circleRadius]);
 
   const [map, setMap] = useState(null);
 
@@ -61,10 +64,16 @@ export default function Map() {
 
   const handleMapClick = async (e) => {
     setCircleCenter(e.lngLat);
-    map.getSource('circle-source').setData({
-      type: 'Point',
-      coordinates: [e.lngLat.lng, e.lngLat.lat],
-    });
+    console.log('New Circle Center:', e.lngLat);
+    
+    if (mapRef.current) {
+      mapRef.current.getSource('circle-source').setData({
+        type: 'Point',
+        coordinates: [e.lngLat.lng, e.lngLat.lat],
+      });
+    }
+    
+    console.log('Circle Data:', [e.lngLat.lng, e.lngLat.lat]);
 
     try {
       const demographicData = await fetchDemographicData(e.lngLat.lng, e.lngLat.lat);
@@ -76,24 +85,19 @@ export default function Map() {
 
   const fetchDemographicData = async (lng, lat) => {
     try {
-      // const response = await fetch('http://localhost:3001/calculate-demographics', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({
-      //     circleCenter: [lng, lat],
-      //     circleRadius: circleRadius,
-      //   }),
-      // });
 
-      const response = await fetch(`http://localhost:3001/foo?circleCenter=${lng},${lat}&circleRadius=${circleRadius}`);
+      const circleCenterLng = lng;
+      const circleCenterLat = lat;
+      console.log(lng,lat);
+
+      const response = await fetch(`http://localhost:3001/foo?circleCenterLat=${circleCenterLat}&circleCenterLng=${circleCenterLng}&circleRadius=${circleRadius}`);
 
       if (!response.ok) {
         throw new Error(`Request failed with status: ${response.status}`);
       }
 
       const demographicData = await response.json();
+      console.log(demographicData);
       return demographicData;
     } catch (error) {
       console.log('Error fetching demographic data:', error);
@@ -112,7 +116,6 @@ export default function Map() {
         min="100"
         />
       </div>
-      <div ref={mapContainer} className="map-container" />
 
       {demographicData && (
         <div className='demographic-results'>
@@ -121,6 +124,10 @@ export default function Map() {
           <p>Average Income: {demographicData.averageIncome}</p>
         </div>
       )}
+      
+      <div ref={mapContainer} className="map-container" />
+
+      
     </div>
   )
 }
