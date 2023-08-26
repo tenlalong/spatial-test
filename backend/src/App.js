@@ -38,7 +38,7 @@ app.get('/foo', async (req, res) => {
   } 
 });
 
-async function calculateDemographicHarvesting(circleCenterLat, circleCenterLng, circleRadius) {
+async function calculateDemographicHarvesting(circleCenterLng, circleCenterLat, circleRadius) {
    
   try {
       const query = `
@@ -48,7 +48,9 @@ async function calculateDemographicHarvesting(circleCenterLat, circleCenterLng, 
           FROM dfw_demo
           WHERE ST_DWithin(spatialObj, ST_SetSRID(ST_MakePoint($1, $2), 4326), $3)`;
 
-    const result = await dbClient.query(query, [circleCenterLat, circleCenterLng, circleRadius]);
+    const result = await dbClient.query(query, [circleCenterLng, circleCenterLat, circleRadius]);
+
+    setCircleCenter(null);
 
       console.log('Query result:', result.rows);
 
